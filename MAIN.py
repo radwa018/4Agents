@@ -1,18 +1,18 @@
 import tkinter as tk
 
-
 class MainGame:
     def __init__(self, ai_level):
         """Initialize the main game based on the chosen AI difficulty level."""
         self.root = tk.Tk()
         self.root.title(f"Connect 4 - {ai_level} Mode")
         self.ai_algorithm = None
-        #ai levels
+
+        # AI levels
         try:
             if ai_level == "Heuristic1":
-                from HEURISTIC1 import find_best_move_heur1,evaluate_board_score
+                from HEURISTIC1 import find_best_move_heur1, evaluate_board_score
                 self.ai_algorithm = (find_best_move_heur1, evaluate_board_score)
-            elif ai_level == "heuristic2":
+            elif ai_level == "Heuristic2":
                 from HEURISTIC2 import valid_moves
                 self.ai_algorithm = valid_moves
             elif ai_level == "Minimax":
@@ -28,12 +28,12 @@ class MainGame:
             self.root.destroy()
 
         # Display AI level (for testing purposes)
-        self.label = tk.Label(self.root, text=f"AI Level: {ai_level}", font=("Time New Roman", 16 ,"bold italic"))
+        self.label = tk.Label(self.root, text=f"AI Level: {ai_level}", font=("Times New Roman", 16, "bold italic"))
         self.label.pack(pady=20)
 
         # Start Button (Placeholder)
         self.start_button = tk.Button(
-            self.root, text="Start Game", font=("Time New Roman", 12,"bold italic"), command=self.play
+            self.root, text="Start Game", font=("Times New Roman", 12, "bold italic"), command=self.play
         )
         self.start_button.pack(pady=10)
 
@@ -45,6 +45,6 @@ class MainGame:
         self.label.config(text="Game Started! (Implement your game logic here)")
 
 if __name__ == "__main__":
-    # Example for testing the MainGame class directly
-    main_game = MainGame("Beginner")
+    # This block is not necessary unless you want to test MainGame directly
+    main_game = MainGame("Heuristic1")  # Example for testing
     main_game.root.mainloop()
