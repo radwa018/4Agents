@@ -77,7 +77,7 @@ def winning_move(board,piece):
                 board[r][c]==piece
                 and board[r-1][c+1]==piece
                 and board[r-2][c+2]==piece
-                and board[r-3][c+2]==piece
+                and board[r-3][c+3]==piece
             ):
                 return True
 def evaluate_window(window,piece):
@@ -133,7 +133,9 @@ def score_position(board,piece):
     return score   
 
 def is_terminal_node(board):
-    return winning_move(board,PLAYER_PIECE) or winning_move(board,AI_PIECE) or len(get_valid_locations(board))==0
+    return (winning_move(board,PLAYER_PIECE) or #checks for player win
+        winning_move(board,AI_PIECE) or #checks for ai win
+        len(get_valid_locations(board))==0) #if there are no valid locations(board if fill)
 
 def minimax_ab(board,depth,alpha,beta,maximizingPlayer):
     valid_locations=get_valid_locations(board)
@@ -141,9 +143,9 @@ def minimax_ab(board,depth,alpha,beta,maximizingPlayer):
     if depth ==0 or is_terminal:
         if is_terminal:
             if winning_move(board,AI_PIECE):
-                return (None,100000000000000)
+                return (None,1e6)
             elif winning_move(board,PLAYER_PIECE):
-                return (None,-10000000000000)
+                return (None,-1e6)
             else: #game is over , no more valid moves
                 return (None,0)
         else: #depth is zerooooooooo

@@ -1,5 +1,5 @@
-import numpy as np # type: ignore
-import pygame # type: ignore
+import numpy as np # type: ignore #matrix operation(game board)
+import pygame # type: ignore #graphics and handling user interaction
 import sys
 import math
 import random
@@ -8,6 +8,7 @@ BLUE=(0,0,153)
 BLACK=(0,0,0)
 RED=(204,0,0)
 YELLOW=(255,255,0)
+#game dimensions
 ROW_COUNT=6
 COLUMN_COUNT=7
 WHITE=(255,255,255)
@@ -22,6 +23,7 @@ WINDOW_LENGTH=4
 
 #creating board
 def create_board():
+    #intialize the game board with zeros(emptyslots)
     board = np.zeros((ROW_COUNT,COLUMN_COUNT)) #row*col matrix
     return board
 
@@ -77,7 +79,7 @@ def winning_move(board,piece):
                 board[r][c]==piece
                 and board[r-1][c+1]==piece
                 and board[r-2][c+2]==piece
-                and board[r-3][c+2]==piece
+                and board[r-3][c+3]==piece
             ):
                 return True
 def evaluate_window(window,piece):
@@ -170,6 +172,46 @@ def evaluate_board_score(board,piece):
                 score+=3
     return score
 
+def minimax(board, depth, maximizingPlayer):
+    valid_locations = get_valid_locations(board)
+    is_terminal = is_terminal_node(board)
+    if depth == 0 or is_terminal:
+        if is_terminal:
+            if winning_move(board, AI_PIECE):
+                return (None, 1e6)
+            elif winning_move(board, PLAYER_PIECE):
+                return (None, -1e6)
+            else:
+                return (None, 0)
+        else:
+            #integration of minimax and heurstic
+            return (None, score_position(board, AI_PIECE)+evaluate_board_score(board,AI_PIECE))
+    if maximizingPlayer:
+        value = -math.inf
+        column = random.choice(valid_locations)
+        for col in valid_locations:
+            row = get_next_open_row(board, col)
+            b_copy = board.copy()
+            drop_piece(b_copy, row, col, AI_PIECE)
+            new_score = minimax(b_copy, depth - 1, False)[1]
+            if new_score > value:
+                value = new_score
+                column = col
+        return column, value
+    else:
+        value = math.inf
+        column = random.choice(valid_locations)
+        for col in valid_locations:
+            row = get_next_open_row(board, col)
+            b_copy = board.copy()
+            drop_piece(b_copy, row, col, PLAYER_PIECE)
+            new_score = minimax(b_copy, depth - 1, True)[1]
+            if new_score < value:
+                value = new_score
+                column = col
+        return column, value       
+  
+
 def get_valid_locations(board):
     valid_location=[]
     for col in range(COLUMN_COUNT):
@@ -216,7 +258,7 @@ pygame.display.update()
 
 myfont=pygame.font.SysFont("timesnewroman",75,bold=True)
 turn =random.randint(PLAYER,AI)
-
+#main game loop 
 while not game_over:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -251,12 +293,13 @@ while not game_over:
                 
                     #switch to ai turn 
                     turn +=1
-                    turn = turn %2 
+                    turn = turn %2 #switch turns
                     
                     print_board(board) 
                     draw_board(board)
         if turn ==AI and not game_over:
-           col=find_best_move_heur1(board)
+           col,minmax_score=minimax(board,4,True)
+        #    col=find_best_move_heur1(board)
            
            if is_valid_location(board, col):
 			       #pygame.time.wait(500)

@@ -77,7 +77,7 @@ def winning_move(board,piece):
                 board[r][c]==piece
                 and board[r-1][c+1]==piece
                 and board[r-2][c+2]==piece
-                and board[r-3][c+2]==piece
+                and board[r-3][c+3]==piece
             ):
                 return True
 def evaluate_window(window,piece):
@@ -259,7 +259,7 @@ while not game_over:
                     draw_board(board)
             	# # Ask for Player 2 Input
             if turn == AI and not game_over:	
-               		
+               	
                 # col = pick_best_move(board, AI_PIECE)
                 col,minimax_score=minimax(board,5,True)
 

@@ -77,7 +77,7 @@ def winning_move(board,piece):
                 board[r][c]==piece
                 and board[r-1][c+1]==piece
                 and board[r-2][c+2]==piece
-                and board[r-3][c+2]==piece
+                and board[r-3][c+3]==piece
             ):
                 return True
 def evaluate_window(window,piece):
@@ -151,6 +151,46 @@ def valid_moves(board):
             best_col = col
 
     return best_col
+def minimax(board, depth, maximizingPlayer):
+    valid_locations = get_valid_locations(board)
+    is_terminal = is_terminal_node(board)
+    if depth == 0 or is_terminal:
+        if is_terminal:
+            if winning_move(board, AI_PIECE):
+                return (None, 1e6)
+            elif winning_move(board, PLAYER_PIECE):
+                return (None, -1e6)
+            else:
+                return (None, 0)
+        else:
+            return (None, score_position(board, AI_PIECE))
+        #prioritize moves
+    column=valid_moves(board)    #integration with minimax(heuristic) 
+    if maximizingPlayer:
+        value = -math.inf
+        column = random.choice(valid_locations)
+        for col in valid_locations:
+            row = get_next_open_row(board, col)
+            b_copy = board.copy()
+            drop_piece(b_copy, row, col, AI_PIECE)
+            new_score = minimax(b_copy, depth - 1, False)[1]
+            if new_score > value:
+                value = new_score
+                column = col #update col to the best move
+        return column, value
+    else:
+        value = math.inf
+        column = random.choice(valid_locations)
+        for col in valid_locations:
+            row = get_next_open_row(board, col)
+            b_copy = board.copy()
+            drop_piece(b_copy, row, col, PLAYER_PIECE)
+            new_score = minimax(b_copy, depth - 1, True)[1]
+            if new_score < value:
+                value = new_score
+                column = col
+        return column, value
+
 def get_valid_locations(board):
     valid_location=[]
     for col in range(COLUMN_COUNT):
@@ -235,9 +275,12 @@ while not game_over:
                     print_board(board) 
                     draw_board(board)
             if turn ==AI and not game_over:
-               col=valid_moves(board)
+                
+                col,minmax_score=minimax(board,4,True)
+
+            #    col=valid_moves(board)
            
-               if is_valid_location(board, col):
+                if is_valid_location(board, col):
 			       #pygame.time.wait(500)
                     row = get_next_open_row(board, col)
                     drop_piece(board, row, col, AI_PIECE)
